@@ -1,0 +1,68 @@
+# Default values for infra-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+kafka:
+  replicaCount: 3
+  # provisioning:
+  #   replicationFactor: 3
+  rbac:
+    create: true
+  metrics:
+    kafka:
+      enabled: true
+  externalAccess:
+    enabled: true
+    autoDiscovery:
+      enabled: true
+
+elasticsearch:
+  service:
+    type: LoadBalancer
+  metrics:
+    enabled: true
+
+# cluster-autoscaler:
+#   autoDiscovery:
+#     clusterName: "aws.rolwynquadras.me"
+  # rbac:
+  #   serviceAccount:
+  #     create: false
+  #     name: "cluster-autoscaler-sa"
+
+cluster-autoscaler:
+  autoscalingGroups:
+    - name: ""
+      maxSize: 6
+      minSize: 3
+  awsAccessKeyID: ""
+  awsSecretAccessKey: ""
+
+prometheus:
+  extraScrapeConfigs: |
+    - job_name: 'Webapp scraper'
+      metrics_path: '/metrics'
+      scrape_interval: 5s
+      static_configs:
+        - targets: ['prd.aws.rolwynquadras.com']
+  server:
+    port: 9090
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+      scrape_timeout: 10s
+
+cert-manager:
+  installCRDs: false
+
+certificate:
+  name: istio-certificate
+  secretName: istio-certificate-secrets
+
+solvers:
+  ingressClass: istio
+
+clusterIssuer:
+  email: quadras.r@northeastern.edu
+  name: letsencrypt-prod
+  dnsName: prod.rolwynquadras.com
